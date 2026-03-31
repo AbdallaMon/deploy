@@ -1,0 +1,1201 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>فاتورة - Tabarak</title>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;700;900&family=Playfair+Display:wght@700&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      :root {
+        --c1: #3d1f08;
+        --c2: #6b3a1f;
+        --c3: #c9a84c;
+        --c4: #fdf6e3;
+        --c5: #c0392b;
+        --c6: #f5e9c8;
+      }
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family: "Tajawal", sans-serif;
+        background: #1a1a1a;
+        display: flex;
+        min-height: 100vh;
+      }
+
+      /* ── SIDEBAR ── */
+      #sidebar {
+        width: 300px;
+        min-width: 300px;
+        background: #111;
+        color: #eee;
+        padding: 0;
+        display: flex;
+        flex-direction: column;
+        overflow-y: auto;
+        border-left: 1px solid #333;
+        direction: ltr;
+      }
+      #sidebar-header {
+        background: #000;
+        padding: 18px 20px;
+        font-size: 14px;
+        font-weight: 700;
+        letter-spacing: 1px;
+        color: #c9a84c;
+        text-transform: uppercase;
+        border-bottom: 1px solid #333;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+      .tab-bar {
+        display: flex;
+        border-bottom: 1px solid #333;
+      }
+      .tab {
+        flex: 1;
+        padding: 10px;
+        text-align: center;
+        font-size: 12px;
+        cursor: pointer;
+        background: #111;
+        color: #888;
+        border-bottom: 2px solid transparent;
+        transition: all 0.2s;
+      }
+      .tab.active {
+        color: #c9a84c;
+        border-bottom-color: #c9a84c;
+        background: #1a1a1a;
+      }
+      .tab-content {
+        display: none;
+        padding: 16px;
+      }
+      .tab-content.active {
+        display: block;
+      }
+
+      .section-title {
+        font-size: 10px;
+        text-transform: uppercase;
+        letter-spacing: 1.5px;
+        color: #555;
+        margin: 16px 0 8px;
+      }
+      .section-title:first-child {
+        margin-top: 0;
+      }
+
+      .ctrl-row {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 10px;
+        gap: 8px;
+      }
+      .ctrl-label {
+        font-size: 12px;
+        color: #aaa;
+        white-space: nowrap;
+        min-width: 90px;
+      }
+      .ctrl-row input[type="text"],
+      .ctrl-row input[type="number"],
+      .ctrl-row select {
+        flex: 1;
+        background: #222;
+        border: 1px solid #444;
+        color: #eee;
+        padding: 5px 8px;
+        border-radius: 4px;
+        font-family: "Tajawal", sans-serif;
+        font-size: 12px;
+        outline: none;
+        direction: rtl;
+      }
+      .ctrl-row input[type="text"]:focus,
+      .ctrl-row input[type="number"]:focus {
+        border-color: #c9a84c;
+      }
+      .ctrl-row input[type="color"] {
+        width: 36px;
+        height: 28px;
+        border: 1px solid #444;
+        border-radius: 4px;
+        background: none;
+        cursor: pointer;
+        padding: 2px;
+      }
+      .color-row {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        margin-bottom: 10px;
+      }
+      .color-row label {
+        font-size: 12px;
+        color: #aaa;
+        flex: 1;
+      }
+      .color-row input[type="color"] {
+        width: 36px;
+        height: 28px;
+        border: 1px solid #444;
+        border-radius: 4px;
+        background: none;
+        cursor: pointer;
+        padding: 2px;
+      }
+      .color-row .hex {
+        font-size: 11px;
+        color: #666;
+        width: 60px;
+        font-family: monospace;
+      }
+
+      .sidebar-btn {
+        width: 100%;
+        padding: 10px;
+        margin-top: 6px;
+        background: #c9a84c;
+        color: #000;
+        border: none;
+        border-radius: 6px;
+        font-family: "Tajawal", sans-serif;
+        font-size: 13px;
+        font-weight: 700;
+        cursor: pointer;
+        transition: background 0.2s;
+      }
+      .sidebar-btn:hover {
+        background: #e8c96a;
+      }
+      .sidebar-btn.outline {
+        background: transparent;
+        border: 1px solid #444;
+        color: #aaa;
+        margin-top: 4px;
+      }
+      .sidebar-btn.outline:hover {
+        border-color: #c9a84c;
+        color: #c9a84c;
+      }
+
+      /* ── MAIN AREA ── */
+      #main {
+        flex: 1;
+        display: flex;
+        align-items: flex-start;
+        justify-content: center;
+        padding: 30px 20px;
+        overflow-y: auto;
+      }
+      .page-wrapper {
+        width: 100%;
+        max-width: 760px;
+      }
+
+      /* ── INVOICE ── */
+      .invoice-card {
+        border-radius: 16px;
+        overflow: hidden;
+        box-shadow: 0 8px 50px rgba(0, 0, 0, 0.5);
+        border: 3px solid var(--c3);
+        background: var(--c4);
+      }
+      .inv-header {
+        background: linear-gradient(
+          120deg,
+          var(--c1) 0%,
+          var(--c2) 60%,
+          var(--c3) 100%
+        );
+        padding: 28px 36px 24px;
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        position: relative;
+        overflow: hidden;
+      }
+      .inv-header::before {
+        content: "";
+        position: absolute;
+        inset: 0;
+        background: repeating-linear-gradient(
+          45deg,
+          transparent,
+          transparent 18px,
+          rgba(255, 255, 255, 0.04) 18px,
+          rgba(255, 255, 255, 0.04) 36px
+        );
+      }
+      .inv-title {
+        font-family: "Playfair Display", serif;
+        font-size: 2.4rem;
+        color: var(--c3);
+        line-height: 1;
+      }
+      .inv-sub {
+        margin-top: 8px;
+        color: rgba(255, 255, 255, 0.7);
+        font-size: 0.9rem;
+        line-height: 1.8;
+      }
+      .inv-company {
+        text-align: left;
+        color: var(--c3);
+        font-size: 1rem;
+        font-weight: 700;
+        line-height: 1.9;
+      }
+      .inv-company span {
+        display: block;
+        color: rgba(255, 255, 255, 0.6);
+        font-weight: 400;
+        font-size: 0.85rem;
+      }
+
+      .meta-bar {
+        background: var(--c6);
+        border-bottom: 2px solid var(--c3);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 12px 36px;
+        flex-wrap: wrap;
+        gap: 10px;
+      }
+      .meta-item {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+      .meta-label {
+        background: var(--c3);
+        color: var(--c1);
+        font-weight: 700;
+        font-size: 0.82rem;
+        padding: 4px 12px;
+        border-radius: 20px;
+      }
+      .meta-value {
+        font-size: 0.95rem;
+        font-weight: 700;
+        color: var(--c1);
+      }
+
+      .body-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+      }
+      @media (max-width: 560px) {
+        .body-grid {
+          grid-template-columns: 1fr;
+        }
+      }
+
+      .notes-panel {
+        padding: 24px 28px;
+        background: #fff8ed;
+        border-left: 2px solid var(--c6);
+      }
+      .notes-title {
+        font-size: 1rem;
+        font-weight: 900;
+        color: var(--c5);
+        margin-bottom: 12px;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+      }
+      .notes-list {
+        list-style: none;
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+      }
+      .notes-list li {
+        font-size: 0.85rem;
+        color: #4a2c10;
+        line-height: 1.6;
+        padding-right: 12px;
+        border-right: 3px solid var(--c3);
+      }
+      .notes-list li.red {
+        color: var(--c5);
+        font-weight: 700;
+        border-right-color: var(--c5);
+      }
+
+      .details-panel {
+        padding: 24px 28px;
+      }
+      .dtable {
+        width: 100%;
+        border-collapse: collapse;
+      }
+      .dtable tr {
+        border-bottom: 1px solid var(--c6);
+      }
+      .dtable tr:hover {
+        background: rgba(201, 168, 76, 0.07);
+      }
+      .dtable td {
+        padding: 10px 6px;
+        font-size: 0.93rem;
+      }
+      .lbl {
+        text-align: left;
+        color: #4a2c10;
+        font-size: 0.85rem;
+      }
+      .val {
+        text-align: right;
+        font-weight: 700;
+        color: var(--c1);
+      }
+      .val.big {
+        color: var(--c3);
+        font-size: 1.08rem;
+      }
+      .val.muted {
+        color: #888;
+        font-weight: 400;
+      }
+
+      .editable {
+        background: transparent;
+        border: none;
+        border-bottom: 1.5px dashed var(--c3);
+        outline: none;
+        font-family: "Tajawal", sans-serif;
+        font-weight: 700;
+        font-size: 0.93rem;
+        color: var(--c1);
+        width: 80px;
+        text-align: right;
+        padding: 2px 4px;
+        border-radius: 3px;
+      }
+      .editable:focus {
+        background: rgba(201, 168, 76, 0.1);
+      }
+
+      .inv-footer {
+        background: linear-gradient(120deg, var(--c1) 0%, var(--c2) 100%);
+        padding: 24px 36px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        flex-wrap: wrap;
+        gap: 12px;
+      }
+      .footer-label {
+        color: var(--c3);
+        font-size: 1.3rem;
+        font-weight: 900;
+      }
+      .footer-amount {
+        display: flex;
+        align-items: baseline;
+        gap: 10px;
+      }
+      .amount-num {
+        font-family: "Playfair Display", serif;
+        font-size: 2.8rem;
+        color: var(--c3);
+        line-height: 1;
+      }
+      .amount-cur {
+        font-size: 1.3rem;
+        font-weight: 900;
+        color: rgba(255, 255, 255, 0.75);
+      }
+      .footer-note {
+        color: rgba(255, 255, 255, 0.55);
+        font-size: 0.78rem;
+        width: 100%;
+        text-align: center;
+      }
+
+      .inv-subfooter {
+        background: var(--c6);
+        border-top: 2px solid var(--c3);
+        padding: 14px 36px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 8px;
+      }
+      .subfooter-note {
+        color: var(--c5);
+        font-size: 0.8rem;
+        font-weight: 700;
+        line-height: 1.6;
+        text-align: right;
+      }
+      .subfooter-contact {
+        color: #4a2c10;
+        font-size: 0.8rem;
+      }
+
+      .print-btn {
+        display: block;
+        margin: 20px auto 0;
+        padding: 11px 38px;
+        background: var(--c3);
+        color: var(--c1);
+        font-family: "Tajawal", sans-serif;
+        font-size: 1rem;
+        font-weight: 900;
+        border: none;
+        border-radius: 30px;
+        cursor: pointer;
+        transition:
+          background 0.2s,
+          transform 0.15s;
+      }
+      .print-btn:hover {
+        background: #e8c96a;
+        transform: translateY(-2px);
+      }
+
+      @media print {
+        #sidebar {
+          display: none !important;
+        }
+        #main {
+          padding: 0;
+        }
+        body {
+          background: white;
+        }
+        .invoice-card {
+          box-shadow: none;
+          border: 1px solid #ccc;
+        }
+        .print-btn {
+          display: none;
+        }
+      }
+
+      /* toggle sidebar on small */
+      #toggle-sidebar {
+        position: fixed;
+        bottom: 20px;
+        left: 20px;
+        background: #c9a84c;
+        color: #000;
+        border: none;
+        border-radius: 50%;
+        width: 48px;
+        height: 48px;
+        font-size: 20px;
+        cursor: pointer;
+        z-index: 999;
+        display: none;
+        align-items: center;
+        justify-content: center;
+        box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
+      }
+      @media (max-width: 750px) {
+        #toggle-sidebar {
+          display: flex;
+        }
+        #sidebar {
+          position: fixed;
+          left: 0;
+          top: 0;
+          bottom: 0;
+          z-index: 998;
+          transform: translateX(-100%);
+          transition: transform 0.3s;
+        }
+        #sidebar.open {
+          transform: translateX(0);
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <!-- SIDEBAR -->
+    <div id="sidebar">
+      <div id="sidebar-header">⚙ محرر الفاتورة</div>
+
+      <div class="tab-bar">
+        <div class="tab active" onclick="switchTab('text')">نصوص</div>
+        <div class="tab" onclick="switchTab('colors')">ألوان</div>
+        <div class="tab" onclick="switchTab('numbers')">أرقام</div>
+      </div>
+
+      <!-- TEXT TAB -->
+      <div class="tab-content active" id="tab-text">
+        <div class="section-title">معلومات الشركة</div>
+        <div class="ctrl-row">
+          <span class="ctrl-label">اسم الشركة</span
+          ><input
+            type="text"
+            id="t-company"
+            value="Tabarak"
+            oninput="applyText()"
+          />
+        </div>
+        <div class="ctrl-row">
+          <span class="ctrl-label">البلد</span
+          ><input
+            type="text"
+            id="t-country"
+            value="Egypt"
+            oninput="applyText()"
+          />
+        </div>
+        <div class="ctrl-row">
+          <span class="ctrl-label">المدينة</span
+          ><input type="text" id="t-city" value="Giza" oninput="applyText()" />
+        </div>
+
+        <div class="section-title">بيانات العميل</div>
+        <div class="ctrl-row">
+          <span class="ctrl-label">اسم العميل</span
+          ><input
+            type="text"
+            id="t-client-ar"
+            value="60- لوجين يونس"
+            oninput="applyText()"
+          />
+        </div>
+        <div class="ctrl-row">
+          <span class="ctrl-label">الاسم (EN)</span
+          ><input
+            type="text"
+            id="t-client-en"
+            value="60- Loujain Younes"
+            oninput="applyText()"
+          />
+        </div>
+        <div class="ctrl-row">
+          <span class="ctrl-label">رقم الهاتف</span
+          ><input
+            type="text"
+            id="t-phone"
+            value="212661977160"
+            oninput="applyText()"
+          />
+        </div>
+        <div class="ctrl-row">
+          <span class="ctrl-label">شهر المحاسبة</span
+          ><input
+            type="text"
+            id="t-date"
+            value="31/11/2025"
+            oninput="applyText()"
+          />
+        </div>
+
+        <div class="section-title">العنوان الرئيسي</div>
+        <div class="ctrl-row">
+          <span class="ctrl-label">عنوان الفاتورة</span
+          ><input
+            type="text"
+            id="t-title"
+            value="Invoice"
+            oninput="applyText()"
+          />
+        </div>
+        <div class="ctrl-row">
+          <span class="ctrl-label">العملة</span
+          ><input
+            type="text"
+            id="t-currency"
+            value="USD"
+            oninput="applyText()"
+          />
+        </div>
+
+        <div class="section-title">ملاحظات (كل سطر = نقطة)</div>
+        <div class="ctrl-row">
+          <span class="ctrl-label">ملاحظة 1</span
+          ><input
+            type="text"
+            id="n1"
+            value="معاً سنحقق أهدافكم"
+            oninput="applyText()"
+          />
+        </div>
+        <div class="ctrl-row">
+          <span class="ctrl-label">ملاحظة 2 🔴</span
+          ><input
+            type="text"
+            id="n2"
+            value="في حالة الغياب أبلغونا قبل موعد الحصة بـ 3 ساعات"
+            oninput="applyText()"
+          />
+        </div>
+        <div class="ctrl-row">
+          <span class="ctrl-label">ملاحظة 3</span
+          ><input
+            type="text"
+            id="n3"
+            value="نرجو سداد الفواتير سريعاً حتى نفي بالتزاماتنا المادية"
+            oninput="applyText()"
+          />
+        </div>
+        <div class="ctrl-row">
+          <span class="ctrl-label">ملاحظة 4</span
+          ><input
+            type="text"
+            id="n4"
+            value="لا تترددوا في التواصل معنا"
+            oninput="applyText()"
+          />
+        </div>
+
+        <div class="section-title">الذيل</div>
+        <div class="ctrl-row">
+          <span class="ctrl-label">تنبيه تحويل</span
+          ><input
+            type="text"
+            id="t-transfer-note"
+            value="عدم كتابة أي ملاحظات أثناء التحويل لأن ذلك يتسبب في احتجاز الحوالة"
+            oninput="applyText()"
+          />
+        </div>
+      </div>
+
+      <!-- COLORS TAB -->
+      <div class="tab-content" id="tab-colors">
+        <div class="section-title">ألوان الهيدر والفوتر</div>
+        <div class="color-row">
+          <label>اللون الأول (داكن)</label
+          ><input
+            type="color"
+            id="c1"
+            value="#3D1F08"
+            oninput="applyColors()"
+          /><span class="hex" id="h1">#3D1F08</span>
+        </div>
+        <div class="color-row">
+          <label>اللون الثاني (وسط)</label
+          ><input
+            type="color"
+            id="c2"
+            value="#6B3A1F"
+            oninput="applyColors()"
+          /><span class="hex" id="h2">#6B3A1F</span>
+        </div>
+        <div class="color-row">
+          <label>لون الذهب / التمييز</label
+          ><input
+            type="color"
+            id="c3"
+            value="#C9A84C"
+            oninput="applyColors()"
+          /><span class="hex" id="h3">#C9A84C</span>
+        </div>
+        <div class="color-row">
+          <label>خلفية الفاتورة</label
+          ><input
+            type="color"
+            id="c4"
+            value="#FDF6E3"
+            oninput="applyColors()"
+          /><span class="hex" id="h4">#FDF6E3</span>
+        </div>
+        <div class="color-row">
+          <label>لون التنبيه / الأحمر</label
+          ><input
+            type="color"
+            id="c5"
+            value="#C0392B"
+            oninput="applyColors()"
+          /><span class="hex" id="h5">#C0392B</span>
+        </div>
+        <div class="color-row">
+          <label>خلفية الشريط الوسيط</label
+          ><input
+            type="color"
+            id="c6"
+            value="#F5E9C8"
+            oninput="applyColors()"
+          /><span class="hex" id="h6">#F5E9C8</span>
+        </div>
+
+        <div class="section-title">إعدادات مسبقة</div>
+        <button class="sidebar-btn outline" onclick="applyPreset('gold')">
+          ذهبي (الافتراضي)
+        </button>
+        <button class="sidebar-btn outline" onclick="applyPreset('blue')">
+          أزرق احترافي
+        </button>
+        <button class="sidebar-btn outline" onclick="applyPreset('green')">
+          أخضر هادئ
+        </button>
+        <button class="sidebar-btn outline" onclick="applyPreset('dark')">
+          داكن أنيق
+        </button>
+        <button class="sidebar-btn outline" onclick="applyPreset('purple')">
+          بنفسجي
+        </button>
+      </div>
+
+      <!-- NUMBERS TAB -->
+      <div class="tab-content" id="tab-numbers">
+        <div class="section-title">قيم الفاتورة</div>
+        <div class="ctrl-row">
+          <span class="ctrl-label">عدد الساعات</span
+          ><input
+            type="number"
+            id="hours"
+            step="0.5"
+            value="5"
+            oninput="recalc()"
+          />
+        </div>
+        <div class="ctrl-row">
+          <span class="ctrl-label">ساعات مجانية</span
+          ><input
+            type="number"
+            id="free"
+            step="0.5"
+            value="0"
+            oninput="recalc()"
+          />
+        </div>
+        <div class="ctrl-row">
+          <span class="ctrl-label">سعر الساعة</span
+          ><input
+            type="number"
+            id="rate"
+            step="0.5"
+            value="5.50"
+            oninput="recalc()"
+          />
+        </div>
+        <div class="ctrl-row">
+          <span class="ctrl-label">رصيد سابق (خصم)</span
+          ><input
+            type="number"
+            id="prev"
+            step="0.01"
+            value="0"
+            oninput="recalc()"
+          />
+        </div>
+        <div class="ctrl-row">
+          <span class="ctrl-label">ديون سابقة</span
+          ><input
+            type="number"
+            id="debt"
+            step="0.01"
+            value="0"
+            oninput="recalc()"
+          />
+        </div>
+        <div class="ctrl-row">
+          <span class="ctrl-label">رسوم تحويل %</span
+          ><input
+            type="number"
+            id="transfer-pct"
+            step="0.5"
+            value="5"
+            oninput="recalc()"
+          />
+        </div>
+
+        <div class="section-title">مزامنة مع الفاتورة</div>
+        <p style="font-size: 11px; color: #555; margin-bottom: 8px">
+          يمكنك تعديل الأرقام في الفاتورة مباشرة أو من هنا
+        </p>
+        <button class="sidebar-btn" onclick="syncFromInvoice()">
+          ↺ تحديث من الفاتورة
+        </button>
+      </div>
+
+      <div style="padding: 16px; border-top: 1px solid #333; margin-top: auto">
+        <button class="sidebar-btn" onclick="window.print()">
+          🖨 طباعة الفاتورة
+        </button>
+        <button class="sidebar-btn outline" onclick="saveToLink()">
+          💾 حفظ الإعدادات
+        </button>
+      </div>
+    </div>
+
+    <!-- MAIN -->
+    <div id="main">
+      <div class="page-wrapper">
+        <div class="invoice-card">
+          <!-- HEADER -->
+          <div class="inv-header">
+            <div>
+              <div class="inv-title" id="v-title">Invoice</div>
+              <div class="inv-sub">
+                <span id="v-client-en">60- Loujain Younes</span><br />
+                <span id="v-phone">212661977160</span>
+              </div>
+            </div>
+            <div class="inv-company">
+              <span id="v-company">Tabarak</span>
+              <span id="v-country">Egypt</span>
+              <span id="v-city">Giza</span>
+            </div>
+          </div>
+
+          <!-- META -->
+          <div class="meta-bar">
+            <div class="meta-item">
+              <div class="meta-label">فاتورة إلى</div>
+              <div class="meta-value" id="v-client-ar">60- لوجين يونس</div>
+            </div>
+            <div class="meta-item">
+              <div class="meta-label">شهر المحاسبة</div>
+              <div class="meta-value" id="v-date">31/11/2025</div>
+            </div>
+          </div>
+
+          <!-- BODY -->
+          <div class="body-grid">
+            <div class="notes-panel">
+              <div class="notes-title">⚠ ملاحظات هامة جداً</div>
+              <ul class="notes-list">
+                <li id="vn1">معاً سنحقق أهدافكم</li>
+                <li class="red" id="vn2">
+                  في حالة الغياب أبلغونا قبل موعد الحصة بـ 3 ساعات حتى لا يتم
+                  تسجيل الحصة عليكم
+                </li>
+                <li id="vn3">
+                  نرجو سداد الفواتير سريعاً حتى نفي بالتزاماتنا المادية
+                </li>
+                <li id="vn4">لا تترددوا في التواصل معنا</li>
+              </ul>
+            </div>
+
+            <div class="details-panel">
+              <table class="dtable">
+                <tr>
+                  <td class="lbl">عدد الساعات</td>
+                  <td class="val">
+                    <input
+                      class="editable"
+                      id="iv-hours"
+                      type="number"
+                      step="0.5"
+                      value="5.0"
+                      oninput="
+                        syncToSidebar('hours', 'iv-hours');
+                        recalc();
+                      "
+                    />
+                  </td>
+                </tr>
+                <tr>
+                  <td class="lbl">الساعات المجانية</td>
+                  <td class="val">
+                    <input
+                      class="editable"
+                      id="iv-free"
+                      type="number"
+                      step="0.5"
+                      value="0"
+                      oninput="
+                        syncToSidebar('free', 'iv-free');
+                        recalc();
+                      "
+                    />
+                  </td>
+                </tr>
+                <tr>
+                  <td class="lbl">سعر الساعة</td>
+                  <td class="val">
+                    <input
+                      class="editable"
+                      id="iv-rate"
+                      type="number"
+                      step="0.5"
+                      value="5.50"
+                      oninput="
+                        syncToSidebar('rate', 'iv-rate');
+                        recalc();
+                      "
+                    />
+                  </td>
+                </tr>
+                <tr>
+                  <td class="lbl">رصيد سابق</td>
+                  <td class="val">
+                    <input
+                      class="editable"
+                      id="iv-prev"
+                      type="number"
+                      step="0.01"
+                      value="0"
+                      oninput="
+                        syncToSidebar('prev', 'iv-prev');
+                        recalc();
+                      "
+                    />
+                  </td>
+                </tr>
+                <tr>
+                  <td class="lbl">ديون سابقة</td>
+                  <td class="val">
+                    <input
+                      class="editable"
+                      id="iv-debt"
+                      type="number"
+                      step="0.01"
+                      value="0"
+                      oninput="
+                        syncToSidebar('debt', 'iv-debt');
+                        recalc();
+                      "
+                    />
+                  </td>
+                </tr>
+                <tr style="border-top: 2px solid var(--c3)">
+                  <td class="lbl" style="font-weight: 700">
+                    الإجمالي بدون رسوم
+                  </td>
+                  <td class="val big" id="v-subtotal">27.50</td>
+                </tr>
+                <tr>
+                  <td class="lbl">رسوم تحويل</td>
+                  <td class="val muted" id="v-transfer">1.38</td>
+                </tr>
+              </table>
+            </div>
+          </div>
+
+          <!-- FOOTER -->
+          <div class="inv-footer">
+            <div class="footer-label">مطلوب سداد مبلغ</div>
+            <div class="footer-amount">
+              <span class="amount-num" id="v-total">28.88</span>
+              <span class="amount-cur" id="v-currency">USD</span>
+            </div>
+            <div class="footer-note">
+              في حالة وجود خطأ في الفاتورة تواصلوا معنا
+            </div>
+          </div>
+
+          <!-- SUB-FOOTER -->
+          <div class="inv-subfooter">
+            <div class="subfooter-contact">
+              📞 <span id="v-phone2">212661977160</span>
+            </div>
+            <div class="subfooter-note">
+              رجاءً من حضراتكم<br />
+              <span id="v-transfer-note"
+                >عدم كتابة أي ملاحظات أثناء التحويل لأن ذلك يتسبب في احتجاز
+                الحوالة</span
+              >
+            </div>
+          </div>
+        </div>
+
+        <button class="print-btn" onclick="window.print()">
+          🖨 طباعة الفاتورة
+        </button>
+      </div>
+    </div>
+
+    <!-- Mobile toggle -->
+    <button
+      id="toggle-sidebar"
+      onclick="document.getElementById('sidebar').classList.toggle('open')"
+    >
+      ⚙
+    </button>
+
+    <script>
+      const TRANSFER_RATE_DEFAULT = 5;
+
+      function switchTab(name) {
+        document
+          .querySelectorAll(".tab")
+          .forEach((t) => t.classList.remove("active"));
+        document
+          .querySelectorAll(".tab-content")
+          .forEach((t) => t.classList.remove("active"));
+        document
+          .querySelector([(onclick = "switchTab('${name}')")])
+          .classList.add("active");
+        document.getElementById("tab-" + name).classList.add("active");
+      }
+
+      function applyText() {
+        const m = (id) => document.getElementById(id);
+        m("v-title").textContent = m("t-title").value;
+        m("v-client-en").textContent = m("t-client-en").value;
+        m("v-client-ar").textContent = m("t-client-ar").value;
+        m("v-phone").textContent = m("t-phone").value;
+        m("v-phone2").textContent = m("t-phone").value;
+        m("v-date").textContent = m("t-date").value;
+        m("v-company").textContent = m("t-company").value;
+        m("v-country").textContent = m("t-country").value;
+        m("v-city").textContent = m("t-city").value;
+        m("v-currency").textContent = m("t-currency").value;
+        m("vn1").textContent = m("n1").value;
+        m("vn2").textContent = m("n2").value;
+        m("vn3").textContent = m("n3").value;
+        m("vn4").textContent = m("n4").value;
+        m("v-transfer-note").textContent = m("t-transfer-note").value;
+        recalc();
+      }
+
+      function applyColors() {
+        const colors = ["c1", "c2", "c3", "c4", "c5", "c6"];
+        colors.forEach((c) => {
+          const val = document.getElementById(c).value;
+          document.documentElement.style.setProperty("--" + c, val);
+          document.getElementById("h" + c.slice(1)).textContent = val;
+        });
+      }
+
+      const presets = {
+        gold: [
+          "#3D1F08",
+          "#6B3A1F",
+          "#C9A84C",
+          "#FDF6E3",
+          "#C0392B",
+          "#F5E9C8",
+        ],
+        blue: [
+          "#0A1628",
+          "#1A3461",
+          "#3A86FF",
+          "#EFF4FF",
+          "#C0392B",
+          "#D6E4FF",
+        ],
+        green: [
+          "#0D2818",
+          "#1A5C35",
+          "#27AE60",
+          "#F0FFF5",
+          "#C0392B",
+          "#D5F5E3",
+        ],
+        dark: [
+          "#0A0A0A",
+          "#1E1E1E",
+          "#E0E0E0",
+          "#2A2A2A",
+          "#E74C3C",
+          "#333333",
+        ],
+        purple: [
+          "#1A0A2E",
+          "#3B1F6B",
+          "#9B59B6",
+          "#F5F0FF",
+          "#E74C3C",
+          "#E8D5FF",
+        ],
+      };
+
+      function applyPreset(name) {
+        const p = presets[name];
+        ["c1", "c2", "c3", "c4", "c5", "c6"].forEach((c, i) => {
+          document.getElementById(c).value = p[i];
+        });
+        applyColors();
+      }
+
+      function recalc() {
+        const hours = parseFloat(document.getElementById("hours").value) || 0;
+        const free = parseFloat(document.getElementById("free").value) || 0;
+        const rate = parseFloat(document.getElementById("rate").value) || 0;
+        const prev = parseFloat(document.getElementById("prev").value) || 0;
+        const debt = parseFloat(document.getElementById("debt").value) || 0;
+        const pct =
+          parseFloat(document.getElementById("transfer-pct").value) || 0;
+
+        const billable = Math.max(0, hours - free);
+        const subtotal = billable * rate - prev + debt;
+        const transfer = subtotal * (pct / 100);
+        const total = subtotal + transfer;
+
+        document.getElementById("v-subtotal").textContent = subtotal.toFixed(2);
+        document.getElementById("v-transfer").textContent = transfer.toFixed(2);
+        document.getElementById("v-total").textContent = total.toFixed(2);
+      }
+
+      function syncToSidebar(sid, ivid) {
+        document.getElementById(sid).value =
+          document.getElementById(ivid).value;
+      }
+
+      function syncFromInvoice() {
+        ["hours", "free", "rate", "prev", "debt"].forEach((k) => {
+          document.getElementById(k).value = document.getElementById(
+            "iv-" + k,
+          ).value;
+        });
+        recalc();
+      }
+
+      function saveToLink() {
+        const params = new URLSearchParams();
+        [
+          "t-company",
+          "t-country",
+          "t-city",
+          "t-client-ar",
+          "t-client-en",
+          "t-phone",
+          "t-date",
+          "t-title",
+          "t-currency",
+          "n1",
+          "n2",
+          "n3",
+          "n4",
+          "t-transfer-note",
+          "c1",
+          "c2",
+          "c3",
+          "c4",
+          "c5",
+          "c6",
+          "hours",
+          "free",
+          "rate",
+          "prev",
+          "debt",
+          "transfer-pct",
+        ].forEach((k) => {
+          params.set(k, document.getElementById(k).value);
+        });
+        const url = location.href.split("?")[0] + "?" + params.toString();
+        navigator.clipboard
+          .writeText(url)
+          .then(() => alert("✅ تم نسخ الرابط! شاركه للحفاظ على إعداداتك"));
+      }
+
+      function loadFromUrl() {
+        const params = new URLSearchParams(location.search);
+        params.forEach((val, key) => {
+          const el = document.getElementById(key);
+          if (el) el.value = val;
+        });
+        applyColors();
+        applyText();
+        recalc();
+      }
+
+      loadFromUrl();
+    </script>
+  </body>
+</html>
